@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Moms World | Business Portal</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -13,7 +13,8 @@
         .moms-pink { color: #e91e63; }
         .bg-moms-pink { background-color: #e91e63; }
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-        @keyframes pop { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes pop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .glass-nav { background: rgba(255, 255, 255, 0.8); backdrop-filter: blur(10px); }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-32 text-slate-800 font-sans">
@@ -24,10 +25,10 @@
                 <img src="moms logo.png" onerror="this.src='https://ui-avatars.com/api/?name=Moms+World&background=e91e63&color=fff'" alt="Logo" class="h-10 w-10 rounded-full object-cover border border-slate-100 shadow-sm">
                 <div>
                     <h1 class="font-black text-sm tracking-tighter uppercase text-slate-900 leading-none">Moms World</h1>
-                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest">Official Business</p>
+                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest leading-none mt-1">Official Shop</p>
                 </div>
             </div>
-            <a href="https://instagram.com/momsworld_vja" target="_blank" class="bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white p-2 rounded-xl shadow-md active:scale-90 transition-all">
+            <a href="https://instagram.com/yourusername" target="_blank" class="bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-600 text-white p-2 rounded-xl shadow-md active:scale-90 transition-all">
                 <i class="fa-brands fa-instagram text-lg"></i>
             </a>
         </div>
@@ -38,11 +39,11 @@
         <section id="store-bio" class="hidden animate-pop">
             <div class="bg-white p-6 rounded-[2.5rem] border border-slate-100 shadow-sm text-center">
                 <h2 class="text-lg font-black text-slate-800 mb-1 font-serif italic">Welcome to Moms World ✨</h2>
-                <p class="text-[11px] text-slate-500 leading-relaxed px-4">Premium essentials curated for you. Select your size and order via WhatsApp! 💖</p>
+                <p class="text-[11px] text-slate-500 leading-relaxed px-4 italic">Premium essentials for mothers and children. Quality and care in every order. 💖</p>
             </div>
         </section>
 
-        <div class="flex bg-slate-200 p-1 rounded-2xl">
+        <div id="tab-container" class="flex bg-slate-200 p-1 rounded-2xl">
             <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm transition-all">Inventory</button>
             <button onclick="switchTab('store')" id="tab-store" class="flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500 transition-all">Live Store</button>
         </div>
@@ -54,42 +55,35 @@
 
             <section class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm">
                 <h2 class="text-md font-bold mb-4 flex items-center gap-2 italic">
-                    <i class="fa-solid fa-plus-circle moms-pink"></i> Create Product
+                    <i class="fa-solid fa-plus-circle moms-pink"></i> Add New Product
                 </h2>
                 <div class="space-y-4">
-                    <input type="text" id="p-name" placeholder="Product Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                    <input type="text" id="p-name" placeholder="Product Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                     <div class="flex gap-3">
                         <input type="number" id="p-price" placeholder="Price" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
                         <input type="text" id="p-category" placeholder="Category" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
                     </div>
-                    
-                    <div class="space-y-1">
-                        <label class="text-[10px] font-black uppercase text-slate-400 ml-2 tracking-widest">Size Options</label>
-                        <input type="text" id="p-sizes" placeholder="e.g. Small, Medium, Large (use commas)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
-                        <p class="text-[9px] text-slate-400 ml-2 italic">Leave empty if the product has no sizes.</p>
-                    </div>
+                    <input type="text" id="p-sizes" placeholder="Sizes (e.g. S, M, L)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                     
                     <div class="grid grid-cols-2 gap-3">
                         <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
                             <i class="fa-solid fa-camera text-xl text-slate-400 mb-1"></i>
                             <span class="text-[9px] font-bold uppercase text-slate-500">Camera</span>
-                            <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewFile(event)">
+                            <input type="file" id="p-img-cam" accept="image/*" capture="environment" class="hidden" onchange="previewFile(event)">
                         </label>
                         <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
                             <i class="fa-solid fa-images text-xl text-slate-400 mb-1"></i>
                             <span class="text-[9px] font-bold uppercase text-slate-500">Gallery</span>
-                            <input type="file" accept="image/*" class="hidden" onchange="previewFile(event)">
+                            <input type="file" id="p-img-gal" accept="image/*" class="hidden" onchange="previewFile(event)">
                         </label>
                     </div>
 
-                    <div id="preview-container" class="hidden relative rounded-2xl overflow-hidden border">
-                        <img id="image-preview" src="" class="w-full h-48 object-cover">
-                        <button onclick="removePreview()" class="absolute top-2 right-2 bg-white/90 backdrop-blur p-2 rounded-full text-red-500">
-                            <i class="fa-solid fa-xmark"></i>
-                        </button>
+                    <div id="preview-container" class="hidden relative rounded-2xl overflow-hidden border h-48">
+                        <img id="image-preview" src="" class="w-full h-full object-cover">
+                        <button onclick="removePreview()" class="absolute top-2 right-2 bg-white/90 p-2 rounded-full text-red-500"><i class="fa-solid fa-xmark"></i></button>
                     </div>
 
-                    <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-widest text-xs">Publish Item</button>
+                    <button onclick="uploadProduct()" id="btn-publish" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg uppercase tracking-widest text-xs">Publish to Cloud</button>
                 </div>
             </section>
             <div id="admin-inventory" class="space-y-3"></div>
@@ -98,240 +92,198 @@
         <div id="view-store" class="hidden space-y-4 animate-pop">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-300"></i>
-                <input type="text" id="store-search" oninput="handleSearch()" placeholder="Search Moms World Catalog..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none shadow-sm">
+                <input type="text" id="store-search" oninput="handleSearch()" placeholder="Search Moms World..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none shadow-sm">
             </div>
             <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="filter-bar"></div>
             <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
         </div>
     </main>
 
-    <div id="cart-drawer" class="fixed bottom-24 left-4 right-4 bg-slate-900 text-white p-5 rounded-[2.5rem] shadow-2xl hidden transform animate-pop z-50 border border-slate-700">
+    <div id="cart-drawer" class="fixed bottom-24 left-4 right-4 bg-slate-900 text-white p-6 rounded-[2.5rem] shadow-2xl hidden z-50 animate-pop border border-slate-700">
         <div class="flex justify-between items-center mb-4 px-2">
-            <h3 class="font-black text-[10px] uppercase tracking-widest moms-pink">Your Bag</h3>
-            <button onclick="clearCart()" class="text-[9px] uppercase font-bold opacity-40">Empty</button>
+            <h3 class="font-black text-[10px] uppercase tracking-widest moms-pink">Shopping Bag</h3>
+            <button onclick="cart=[]; updateCartUI()" class="text-[9px] uppercase font-bold opacity-40">Empty</button>
         </div>
         <div id="cart-items" class="max-h-40 overflow-y-auto mb-4 space-y-3 text-sm no-scrollbar px-1"></div>
         <div class="border-t border-slate-700 pt-4 flex justify-between items-center px-2">
-            <div>
-                <p class="text-[10px] opacity-40 uppercase font-bold">Total</p>
-                <p class="text-xl font-black" id="cart-total">$0.00</p>
-            </div>
-            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg">
-                WhatsApp Order
-            </button>
+            <div><p class="text-[10px] opacity-40 uppercase font-bold">Total</p><p class="text-xl font-black" id="cart-total">$0.00</p></div>
+            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest active:scale-95 transition-all">Send Order</button>
         </div>
     </div>
 
-    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
-        <div class="max-w-md mx-auto flex justify-around items-center">
-            <button onclick="switchTab('admin')" class="flex flex-col items-center gap-1 text-slate-900"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[9px] font-bold uppercase">Admin</span></button>
-            <button onclick="toggleQR()" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-qrcode text-xl"></i><span class="text-[9px] font-bold uppercase">QR</span></button>
-            <button onclick="copyLink()" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase">Link</span></button>
+    <nav class="fixed bottom-0 left-0 right-0 glass-nav border-t p-4 z-50">
+        <div class="max-w-md mx-auto flex justify-around items-center text-slate-400">
+            <button onclick="switchTab('admin')" id="nav-admin" class="flex flex-col items-center gap-1 active:text-slate-900"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[9px] font-bold uppercase">Admin</span></button>
+            <button onclick="toggleQR()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-qrcode text-xl"></i><span class="text-[9px] font-bold uppercase tracking-widest">QR</span></button>
+            <button onclick="copyLink()" class="flex flex-col items-center gap-1"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold uppercase">Share</span></button>
         </div>
     </nav>
 
-    <div id="qr-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden items-center justify-center z-[60] p-6">
-        <div class="bg-white w-full max-w-xs rounded-[3rem] p-10 text-center shadow-2xl animate-pop">
+    <div id="qr-modal" class="fixed inset-0 bg-slate-900/90 hidden items-center justify-center z-[60] p-6">
+        <div class="bg-white w-full max-w-xs rounded-[3rem] p-10 text-center animate-pop">
             <div id="qrcode" class="flex justify-center mb-8 p-3 bg-white border rounded-3xl"></div>
-            <button onclick="toggleQR()" class="w-full py-3 text-slate-400 font-bold mb-2">Dismiss</button>
+            <button onclick="toggleQR()" class="w-full py-3 text-slate-400 font-bold mb-2">Back</button>
             <button onclick="window.print()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Print QR</button>
         </div>
     </div>
 
     <script>
-        const db = new Dexie("MomsWorldV3DB");
-        db.version(1).stores({ products: "++id, name, price, category, image, sizes, isSoldOut" });
+        // --- YOUR SUPABASE KEYS INTEGRATED ---
+        const SUPABASE_URL = 'https://kqgeojqdmyuejteqtczu.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_HaDa8rT3A4_l2E9DhzpGwQ_wJYDBNzO'; 
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let products = [];
         let cart = [];
         let currentFilter = 'All';
         let currentSearchQuery = '';
+        let selectedFile = null;
+
+        window.onload = () => {
+            fetchProducts();
+            const params = new URLSearchParams(window.location.search);
+            // AUTO-HIDE ADMIN IF view=store is in URL
+            if (params.get('view') === 'store') {
+                document.getElementById('tab-container').style.display = 'none';
+                document.getElementById('nav-admin').style.display = 'none';
+                switchTab('store');
+            }
+        };
+
+        async function fetchProducts() {
+            const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
+            if (!error) { products = data; refreshUI(); }
+        }
 
         function previewFile(event) {
-            const file = event.target.files[0];
-            if (!file) return;
+            selectedFile = event.target.files[0];
+            if (!selectedFile) return;
             const reader = new FileReader();
             reader.onload = (e) => {
-                const img = document.getElementById('image-preview');
-                img.src = e.target.result;
+                document.getElementById('image-preview').src = e.target.result;
                 document.getElementById('preview-container').classList.remove('hidden');
             }
-            reader.readAsDataURL(file);
+            reader.readAsDataURL(selectedFile);
         }
 
-        function removePreview() {
-            document.getElementById('image-preview').src = "";
-            document.getElementById('preview-container').classList.add('hidden');
-        }
+        function removePreview() { selectedFile = null; document.getElementById('preview-container').classList.add('hidden'); }
 
-        async function saveProduct() {
+        async function uploadProduct() {
             const name = document.getElementById('p-name').value;
             const price = document.getElementById('p-price').value;
-            const category = document.getElementById('p-category').value || "New Arrival";
+            const category = document.getElementById('p-category').value || "General";
             const sizes = document.getElementById('p-sizes').value;
-            const image = document.getElementById('image-preview').src;
+            const btn = document.getElementById('btn-publish');
 
-            if(!name || !price || !image) return alert("Please fill all details!");
+            if (!name || !price || !selectedFile) return alert("Please fill all details and pick a photo!");
 
-            await db.products.add({ name, price, category, sizes, image, isSoldOut: false });
-            
-            document.getElementById('p-name').value = '';
-            document.getElementById('p-price').value = '';
-            document.getElementById('p-category').value = '';
-            document.getElementById('p-sizes').value = '';
-            removePreview();
-            
-            refreshUI();
-            alert("Product published!");
+            btn.innerText = "PUBLISHING..."; btn.disabled = true;
+
+            const fileName = `${Date.now()}-${selectedFile.name.replace(/\s/g, '_')}`;
+            const { data, error: uploadError } = await supabaseClient.storage.from('product-images').upload(fileName, selectedFile);
+
+            if (uploadError) { alert("Upload failed! Ensure 'product-images' bucket is public."); btn.disabled = false; return; }
+
+            const { data: { publicUrl } } = supabaseClient.storage.from('product-images').getPublicUrl(fileName);
+
+            const { error: dbError } = await supabaseClient.from('products').insert([{
+                name, price: parseFloat(price), category, sizes, image_url: publicUrl
+            }]);
+
+            if (dbError) alert("Database Error! Run the SQL update in Supabase."); else location.reload();
         }
 
-        async function deleteProduct(id) {
-            if(confirm("Delete this product?")) { await db.products.delete(id); refreshUI(); }
-        }
+        async function deleteProduct(id) { if (confirm("Delete permanently?")) { await supabaseClient.from('products').delete().eq('id', id); fetchProducts(); } }
 
-        async function toggleSoldOut(id, status) {
-            await db.products.update(id, { isSoldOut: !status }); refreshUI();
-        }
-
-        function addToCart(id, name, price) {
-            const sizeEl = document.getElementById(`size-${id}`);
-            const size = sizeEl ? sizeEl.value : null;
-
-            // Logic to ensure customer picks a size if options exist
-            if(sizeEl && !size) return alert("Please select a size first!");
-
-            const existing = cart.find(i => i.id === id && i.size === size);
-            if(existing) existing.qty++;
-            else cart.push({ id, name, price, size, qty: 1 });
-            
+        function addToBag(id) {
+            const p = products.find(i => i.id === id);
+            const sz = document.getElementById(`sz-${id}`)?.value;
+            if (document.getElementById(`sz-${id}`) && !sz) return alert("Select a size!");
+            const existing = cart.find(i => i.id === id && i.size === sz);
+            if(existing) existing.qty++; else cart.push({ ...p, size: sz, qty: 1 });
             updateCartUI();
         }
 
-        function removeFromCart(i) { cart.splice(i, 1); updateCartUI(); }
-        function clearCart() { cart = []; updateCartUI(); }
-
         function updateCartUI() {
             const drawer = document.getElementById('cart-drawer');
-            const list = document.getElementById('cart-items');
-            const totalEl = document.getElementById('cart-total');
-            
             if(cart.length === 0) { drawer.classList.add('hidden'); return; }
             drawer.classList.remove('hidden');
-
             let total = 0;
-            list.innerHTML = cart.map((item, i) => {
+            document.getElementById('cart-items').innerHTML = cart.map((item, i) => {
                 total += item.price * item.qty;
-                return `
-                    <div class="flex justify-between items-center bg-slate-800 p-3 rounded-2xl border border-slate-700">
-                        <div>
-                            <p class="font-bold text-[11px] uppercase text-white">${item.name} ${item.size ? `<span class="moms-pink">[${item.size}]</span>` : ''}</p>
-                            <p class="text-[9px] opacity-40 font-black">${item.qty}x • $${(item.price * item.qty).toFixed(2)}</p>
-                        </div>
-                        <button onclick="removeFromCart(${i})" class="text-pink-500"><i class="fa-solid fa-minus-circle"></i></button>
-                    </div>`;
+                return `<div class="flex justify-between items-center bg-slate-800 p-3 rounded-2xl border border-slate-700 text-white text-[11px]">
+                    <div>${item.name} <span class="moms-pink">${item.size ? `(${item.size})` : ''}</span><br><span class="opacity-40 text-[9px]">${item.qty}x • $${(item.price * item.qty).toFixed(2)}</span></div>
+                    <button onclick="cart.splice(${i}, 1); updateCartUI()" class="text-pink-500"><i class="fa-solid fa-minus-circle"></i></button>
+                </div>`;
             }).join('');
-            totalEl.innerText = `$${total.toFixed(2)}`;
+            document.getElementById('cart-total').innerText = `$${total.toFixed(2)}`;
         }
 
         function checkoutWA() {
-            const phone = "1234567890"; // CHANGE TO YOUR NUMBER
-            let total = 0;
-            let text = `💖 *MOMS WORLD ORDER*\n━━━━━━━━━━━━━━━\n`;
-            cart.forEach(item => {
-                total += item.price * item.qty;
-                text += `• ${item.qty}x ${item.name} ${item.size ? `(Size: ${item.size})` : ''} - $${(item.price * item.qty).toFixed(2)}\n`;
-            });
-            text += `━━━━━━━━━━━━━━━\n💰 *Total: $${total.toFixed(2)}*\n\nPlease confirm availability!`;
-            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`);
+            let total = 0; let msg = `🛍️ *MOMS WORLD ORDER*\n`;
+            cart.forEach(i => { total += i.price * i.qty; msg += `• ${i.qty}x ${i.name} ${i.size ? `[${i.size}]` : ''} - $${(i.price * i.qty).toFixed(2)}\n`; });
+            msg += `\n💰 *Total: $${total.toFixed(2)}*`;
+            window.open(`https://wa.me/1234567890?text=${encodeURIComponent(msg)}`);
         }
 
         function shareToStatus() {
-            const ad = `✨ *Moms World is Online!* ✨\n\nBrowse our latest items and order directly via WhatsApp! 💖\n\n👇 Click to view:\n${window.location.href}`;
-            window.open(`https://wa.me/?text=${encodeURIComponent(ad)}`);
+            window.open(`https://wa.me/?text=${encodeURIComponent('✨ Moms World is Online! ✨\nCheck our catalog: ' + window.location.href + '?view=store')}`);
         }
 
-        function handleSearch() {
-            currentSearchQuery = document.getElementById('store-search').value.toLowerCase();
-            refreshUI();
-        }
-
+        function handleSearch() { currentSearchQuery = document.getElementById('store-search').value.toLowerCase(); refreshUI(); }
         async function filterProducts(cat) { currentFilter = cat; refreshUI(); }
 
-        async function refreshUI() {
-            const all = await db.products.toArray();
-            const filtered = all.filter(p => (currentFilter === 'All' || p.category === currentFilter) && p.name.toLowerCase().includes(currentSearchQuery));
-            renderAdmin(all);
-            renderStore(filtered);
-            renderFilters(all);
+        function refreshUI() {
+            const filtered = products.filter(p => (currentFilter === 'All' || p.category === currentFilter) && p.name.toLowerCase().includes(currentSearchQuery));
+            renderAdmin(products); renderStore(filtered); renderFilters(products);
         }
 
-        function renderAdmin(products) {
-            document.getElementById('admin-inventory').innerHTML = products.map(p => `
-                <div class="bg-white p-3 rounded-2xl flex items-center gap-4 border border-slate-100 shadow-sm">
-                    <img src="${p.image}" class="w-12 h-12 rounded-xl object-cover border">
-                    <div class="flex-1 min-w-0"><h4 class="font-bold text-[11px] uppercase truncate text-slate-800">${p.name}</h4><p class="text-[10px] moms-pink font-black">$${p.price}</p></div>
-                    <div class="flex gap-1">
-                        <button onclick="toggleSoldOut(${p.id}, ${p.isSoldOut})" class="p-2 rounded-lg ${p.isSoldOut ? 'bg-pink-100 text-pink-600' : 'bg-slate-50 text-slate-300'}"><i class="fa-solid fa-tag text-[10px]"></i></button>
-                        <button onclick="deleteProduct(${p.id})" class="p-2 bg-slate-50 text-slate-400 rounded-lg"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+        function renderAdmin(list) {
+            document.getElementById('admin-inventory').innerHTML = list.map(p => `
+                <div class="bg-white p-3 rounded-2xl flex items-center gap-4 border shadow-sm">
+                    <img src="${p.image_url}" class="w-12 h-12 rounded-xl object-cover border">
+                    <div class="flex-1 min-w-0"><h4 class="font-bold text-[10px] uppercase truncate">${p.name}</h4><p class="text-[9px] moms-pink font-black">$${p.price}</p></div>
+                    <button onclick="deleteProduct('${p.id}')" class="p-2 bg-slate-50 text-slate-400 rounded-lg"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                </div>`).join('');
+        }
+
+        function renderFilters(list) {
+            const cats = [...new Set(list.map(p => p.category))];
+            document.getElementById('filter-bar').innerHTML = `<button onclick="filterProducts('All')" class="px-5 py-2 rounded-full ${currentFilter === 'All' ? 'bg-slate-900 text-white' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase tracking-widest">All</button>` + 
+                cats.map(cat => `<button onclick="filterProducts('${cat}')" class="px-5 py-2 rounded-full ${currentFilter === cat ? 'bg-slate-900 text-white' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase tracking-widest">${cat}</button>`).join('');
+        }
+
+        function renderStore(list) {
+            const grid = document.getElementById('store-grid');
+            if(list.length === 0) { grid.innerHTML = `<p class="col-span-2 text-center text-slate-300 py-12 text-[10px] uppercase font-black">Storefront Empty</p>`; return; }
+            grid.innerHTML = list.map(p => `
+                <div class="bg-white rounded-[2.5rem] border overflow-hidden relative shadow-sm animate-pop">
+                    <img src="${p.image_url}" class="w-full h-40 object-cover">
+                    <div class="p-4 text-center">
+                        <h3 class="font-black text-[10px] uppercase tracking-tighter mb-1 text-slate-700 truncate">${p.name}</h3>
+                        <p class="moms-pink font-black text-xs mb-3 font-serif">$${parseFloat(p.price).toFixed(2)}</p>
+                        ${p.sizes ? `<select id="sz-${p.id}" class="w-full mb-3 p-2 text-[9px] border border-slate-100 rounded-xl bg-slate-50 font-bold uppercase text-center focus:ring-1 focus:ring-pink-200 outline-none appearance-none cursor-pointer"><option value="" disabled selected>Select Size</option>${p.sizes.split(',').map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('')}</select>` : ''}
+                        <button onclick="addToBag('${p.id}')" class="w-full bg-slate-900 text-white py-3 rounded-2xl text-[9px] font-black uppercase shadow-md active:scale-95 transition-all">Add to bag</button>
                     </div>
                 </div>`).join('');
         }
 
-        function renderFilters(products) {
-            const cats = [...new Set(products.map(p => p.category))];
-            document.getElementById('filter-bar').innerHTML = `<button onclick="filterProducts('All')" class="px-5 py-2 rounded-full ${currentFilter === 'All' ? 'bg-slate-900 text-white shadow-md' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase">All</button>` + 
-                cats.map(cat => `<button onclick="filterProducts('${cat}')" class="px-5 py-2 rounded-full ${currentFilter === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase">${cat}</button>`).join('');
-        }
-
-        function renderStore(products) {
-            const grid = document.getElementById('store-grid');
-            if(products.length === 0) { grid.innerHTML = `<p class="col-span-2 text-center text-slate-300 py-12 text-[10px] uppercase font-black">Nothing in stock</p>`; return; }
-            grid.innerHTML = products.map(p => {
-                const sizeArray = p.sizes ? p.sizes.split(',').map(s => s.trim()).filter(s => s !== "") : [];
-                return `
-                <div class="bg-white rounded-[2.5rem] border border-slate-100 overflow-hidden relative ${p.isSoldOut ? 'grayscale opacity-60' : ''} shadow-sm animate-pop">
-                    ${p.isSoldOut ? '<div class="absolute top-3 right-3 bg-pink-600 text-white text-[7px] font-black px-2 py-1 rounded-full z-10 uppercase shadow-lg">Sold Out</div>' : ''}
-                    <img src="${p.image}" class="w-full h-40 object-cover">
-                    <div class="p-4 text-center">
-                        <h3 class="font-black text-[10px] uppercase tracking-tighter mb-1 text-slate-700 truncate">${p.name}</h3>
-                        <p class="moms-pink font-black text-xs mb-3">$${parseFloat(p.price).toFixed(2)}</p>
-                        
-                        ${sizeArray.length > 0 && !p.isSoldOut ? `
-                            <select id="size-${p.id}" class="w-full mb-3 p-2 text-[10px] border border-slate-100 rounded-xl bg-slate-50 outline-none font-bold uppercase text-center appearance-none">
-                                <option value="" disabled selected>Select Size</option>
-                                ${sizeArray.map(s => `<option value="${s}">${s}</option>`).join('')}
-                            </select>
-                        ` : ''}
-
-                        <button onclick="${p.isSoldOut ? '' : `addToCart(${p.id}, '${p.name}', ${p.price})`}" 
-                            class="w-full ${p.isSoldOut ? 'bg-slate-100 text-slate-300' : 'bg-slate-900 text-white'} py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-md">
-                            ${p.isSoldOut ? 'Check Soon' : 'Add to bag'}
-                        </button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function switchTab(tab) {
-            const admin = tab === 'admin';
-            document.getElementById('view-admin').classList.toggle('hidden', !admin);
-            document.getElementById('view-store').classList.toggle('hidden', admin);
-            document.getElementById('store-bio').classList.toggle('hidden', admin);
-            document.getElementById('tab-admin').className = admin ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
-            document.getElementById('tab-store').className = !admin ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
-            if(!admin) updateCartUI();
-            refreshUI();
+        function switchTab(t) {
+            const ad = t === 'admin';
+            document.getElementById('view-admin').classList.toggle('hidden', !ad);
+            document.getElementById('view-store').classList.toggle('hidden', ad);
+            document.getElementById('store-bio').classList.toggle('hidden', ad);
+            document.getElementById('tab-admin').className = ad ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
+            document.getElementById('tab-store').className = !ad ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
         }
 
         let qrc = false;
         function toggleQR() {
-            const modal = document.getElementById('qr-modal');
-            modal.classList.toggle('hidden'); modal.classList.toggle('flex');
-            if(!qrc) { new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 200, height: 200 }); qrc = true; }
+            const m = document.getElementById('qr-modal'); m.classList.toggle('hidden'); m.classList.toggle('flex');
+            if(!qrc) { new QRCode(document.getElementById("qrcode"), { text: window.location.href + '?view=store', width: 180, height: 180 }); qrc = true; }
         }
 
-        function copyLink() { navigator.clipboard.writeText(window.location.href); alert("Store link copied!"); }
-
-        refreshUI();
+        function copyLink() { navigator.clipboard.writeText(window.location.href + '?view=store'); alert("Customer Store Link Copied!"); }
     </script>
 </body>
 </html>
