@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Moms World | Elite Admin</title>
+    <title>Moms World | Pro Admin & Store</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -14,13 +14,14 @@
         .animate-pop { animation: pop 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
         @keyframes pop { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         
-        /* Toggle Switch Styling */
         .switch { position: relative; display: inline-block; width: 34px; height: 20px; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #cbd5e1; transition: .4s; border-radius: 34px; }
         .slider:before { position: absolute; content: ""; height: 14px; width: 14px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
         input:checked + .slider { background-color: #e91e63; }
         input:checked + .slider:before { transform: translateX(14px); }
+
+        .filter-btn.active { background-color: #e91e63; color: white; border-color: #e91e63; }
     </style>
 </head>
 <body class="bg-slate-50 min-h-screen pb-40 text-slate-800 font-sans">
@@ -30,8 +31,8 @@
             <div class="flex items-center gap-3">
                 <img src="moms logo.png" onerror="this.src='https://ui-avatars.com/api/?name=Moms+World&background=e91e63&color=fff'" class="h-10 w-10 rounded-full object-cover border shadow-sm">
                 <div>
-                    <h1 class="font-black text-sm uppercase text-slate-900 leading-none">Moms World</h1>
-                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest mt-1">Inventory Control</p>
+                    <h1 class="font-black text-sm uppercase text-slate-900">Moms World</h1>
+                    <p class="text-[8px] font-bold moms-pink uppercase tracking-widest mt-1">Premium Baby Boutique</p>
                 </div>
             </div>
         </div>
@@ -46,40 +47,37 @@
                 </div>
                 <h2 class="text-xl font-black">Security Pin</h2>
                 <input type="password" id="admin-pin" maxlength="4" placeholder="••••" class="w-32 text-center text-2xl font-black tracking-[1rem] p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
-                <button onclick="checkPin()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs">Login</button>
+                <button onclick="checkPin()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs">Unlock</button>
             </div>
         </section>
 
         <div id="tab-container" class="flex bg-slate-200 p-1 rounded-2xl">
-            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900">Admin</button>
+            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900">Manage</button>
             <button onclick="switchTab('store')" id="tab-store" class="flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500">Live Store</button>
         </div>
 
         <div id="view-admin" class="hidden space-y-6">
-            
             <div id="edit-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm hidden items-center justify-center z-[100] p-6">
                 <div class="bg-white w-full max-w-sm rounded-[2.5rem] p-8 space-y-4 animate-pop shadow-2xl overflow-y-auto max-h-[90vh] no-scrollbar">
                     <h3 class="font-black text-xs uppercase tracking-widest text-slate-400">Edit Product</h3>
                     <input type="hidden" id="edit-id">
                     <div class="space-y-3">
                         <input type="text" id="edit-name" placeholder="Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                        <input type="number" id="edit-price" placeholder="Price (₹)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                        <div class="flex gap-2">
+                            <input type="number" id="edit-price" placeholder="Price" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
+                            <input type="text" id="edit-category" placeholder="Category" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
+                        </div>
+                        <input type="text" id="edit-sizes" placeholder="Sizes (e.g. S, M, L)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                         <div class="p-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
-                            <p class="text-[9px] font-black uppercase text-slate-400 mb-2">Change Image</p>
-                            <input type="file" id="edit-img-input" accept="image/*" class="text-[10px] w-full" onchange="previewEditFile(event)">
+                            <input type="file" id="edit-img-input" accept="image/*" class="text-[10px]" onchange="previewEditFile(event)">
                             <img id="edit-img-prev" class="hidden w-full h-24 object-cover rounded-lg mt-2 border">
                         </div>
                     </div>
                     <div class="flex gap-2 pt-4">
                         <button onclick="closeEdit()" class="flex-1 py-4 text-slate-400 font-bold uppercase text-[10px]">Cancel</button>
-                        <button onclick="saveEdit()" id="btn-save-edit" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-[10px]">Save Changes</button>
+                        <button onclick="saveEdit()" id="btn-save-edit" class="flex-1 bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-[10px]">Save</button>
                     </div>
                 </div>
-            </div>
-
-            <div class="relative">
-                <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs"></i>
-                <input type="text" id="admin-search" oninput="renderUI()" placeholder="Find item..." class="w-full pl-10 pr-4 py-3 bg-white border border-slate-200 rounded-xl outline-none text-xs">
             </div>
 
             <div id="admin-inventory" class="space-y-3"></div>
@@ -87,22 +85,26 @@
             <section class="bg-white p-6 rounded-[2.5rem] border shadow-sm space-y-4">
                 <h3 class="text-[10px] font-black uppercase text-slate-400">Add New Arrival</h3>
                 <div class="space-y-3">
-                    <input type="text" id="p-name" placeholder="Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
-                    <input type="number" id="p-price" placeholder="Price (₹)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                    <input type="text" id="p-name" placeholder="Product Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
+                    <div class="flex gap-2">
+                        <input type="number" id="p-price" placeholder="Price (₹)" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
+                        <input type="text" id="p-category" placeholder="Category" class="flex-1 p-4 bg-slate-50 border rounded-2xl outline-none">
+                    </div>
+                    <input type="text" id="p-sizes" placeholder="Sizes (e.g. 0-3M, 3-6M)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                     <label class="flex flex-col items-center justify-center p-6 border-2 border-dashed border-slate-200 rounded-2xl cursor-pointer bg-slate-50">
                         <i class="fa-solid fa-camera text-xl text-slate-300 mb-1"></i>
-                        <span class="text-[9px] font-bold uppercase text-slate-400">Upload Photo</span>
+                        <span class="text-[9px] font-bold uppercase text-slate-400 text-center">Tap to Upload Photo</span>
                         <input type="file" id="p-img" accept="image/*" class="hidden" onchange="handleFile(event)">
                     </label>
-                    <div id="preview-box" class="hidden relative h-32 rounded-2xl overflow-hidden border">
-                        <img id="img-prev" class="w-full h-full object-cover">
-                    </div>
+                    <div id="preview-box" class="hidden relative h-32 rounded-2xl overflow-hidden border"><img id="img-prev" class="w-full h-full object-cover"></div>
                     <button onclick="uploadProduct()" id="btn-pub" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl uppercase text-xs">Publish Item</button>
                 </div>
             </section>
         </div>
 
         <div id="view-store" class="hidden space-y-6 animate-pop">
+            <div id="category-bar" class="flex gap-2 overflow-x-auto no-scrollbar py-2 px-1"></div>
+            
             <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
         </div>
     </main>
@@ -115,6 +117,7 @@
         const MASTER_PIN = '1234'; 
         let isAdminAuthenticated = false;
         let products = [];
+        let currentFilter = 'All';
         let selectedFile = null;
         let selectedEditFile = null;
 
@@ -128,7 +131,7 @@
 
         async function fetchProducts() {
             const { data, error } = await supabaseClient.from('products').select('*').order('created_at', { ascending: false });
-            if (!error) { products = data; renderUI(); }
+            if (!error) { products = data; renderUI(); renderFilters(); }
         }
 
         function checkPin() {
@@ -139,91 +142,105 @@
             } else { alert("Wrong PIN!"); }
         }
 
-        // --- TOGGLE VISIBILITY ---
-        async function toggleVisibility(id, currentStatus) {
-            const { error } = await supabaseClient.from('products').update({ is_active: !currentStatus }).eq('id', id);
-            if (!error) fetchProducts();
+        // --- FILTER LOGIC ---
+        function renderFilters() {
+            const activeItems = products.filter(p => p.is_active);
+            const categories = ['All', ...new Set(activeItems.map(p => p.category || 'Other'))];
+            
+            document.getElementById('category-bar').innerHTML = categories.map(cat => `
+                <button onclick="setFilter('${cat}')" 
+                        class="filter-btn shrink-0 px-5 py-2 rounded-full border border-slate-200 bg-white text-[10px] font-black uppercase tracking-wider transition-all shadow-sm ${currentFilter === cat ? 'active' : ''}">
+                    ${cat}
+                </button>
+            `).join('');
         }
 
-        // --- MASTER EDIT SAVE ---
+        function setFilter(cat) {
+            currentFilter = cat;
+            renderFilters();
+            renderUI();
+        }
+
+        async function toggleVisibility(id, currentStatus) {
+            await supabaseClient.from('products').update({ is_active: !currentStatus }).eq('id', id);
+            fetchProducts();
+        }
+
         async function saveEdit() {
             const id = document.getElementById('edit-id').value;
             const btn = document.getElementById('btn-save-edit');
             btn.innerText = "SAVING..."; btn.disabled = true;
 
-            let finalImageUrl = products.find(p => p.id === id).image_url;
-
+            let finalUrl = products.find(p => p.id === id).image_url;
             if (selectedEditFile) {
                 const fName = `${Date.now()}-edit-${selectedEditFile.name.replace(/\s/g, '_')}`;
                 const { error: uErr } = await supabaseClient.storage.from('product-images').upload(fName, selectedEditFile);
                 if (!uErr) {
                     const { data: { publicUrl } } = supabaseClient.storage.from('product-images').getPublicUrl(fName);
-                    finalImageUrl = publicUrl;
+                    finalUrl = publicUrl;
                 }
             }
 
             const updates = {
                 name: document.getElementById('edit-name').value,
                 price: parseFloat(document.getElementById('edit-price').value),
-                image_url: finalImageUrl
+                category: document.getElementById('edit-category').value,
+                sizes: document.getElementById('edit-sizes').value,
+                image_url: finalUrl
             };
 
-            const { error } = await supabaseClient.from('products').update(updates).eq('id', id);
-            if (error) alert("Error: " + error.message);
-            else { closeEdit(); fetchProducts(); }
-            btn.innerText = "Save Changes"; btn.disabled = false;
+            await supabaseClient.from('products').update(updates).eq('id', id);
+            closeEdit(); fetchProducts();
+            btn.innerText = "Save"; btn.disabled = false;
         }
 
         function renderUI() {
-            const query = document.getElementById('admin-search')?.value.toLowerCase() || "";
-            const filtered = products.filter(p => p.name.toLowerCase().includes(query));
-
-            // ADMIN PANEL RENDER
-            document.getElementById('admin-inventory').innerHTML = filtered.map(p => `
+            // Admin Render
+            document.getElementById('admin-inventory').innerHTML = products.map(p => `
                 <div class="bg-white p-3 rounded-2xl flex items-center justify-between border shadow-sm">
                     <div class="flex items-center gap-3">
                         <img src="${p.image_url}" class="w-10 h-10 rounded-lg object-cover border">
                         <div>
                             <p class="text-[10px] font-black uppercase truncate w-24">${p.name}</p>
-                            <p class="text-[9px] moms-pink font-bold">₹${p.price}</p>
+                            <p class="text-[9px] moms-pink font-bold">₹${p.price} | ${p.category || 'N/A'}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <label class="switch">
-                            <input type="checkbox" ${p.is_active ? 'checked' : ''} onchange="toggleVisibility('${p.id}', ${p.is_active})">
-                            <span class="slider"></span>
-                        </label>
+                    <div class="flex items-center gap-2">
+                        <label class="switch"><input type="checkbox" ${p.is_active ? 'checked' : ''} onchange="toggleVisibility('${p.id}', ${p.is_active})"><span class="slider"></span></label>
                         <button onclick="openEdit('${p.id}')" class="bg-slate-50 text-indigo-400 p-2 rounded-lg"><i class="fa-solid fa-pencil text-xs"></i></button>
-                        <button onclick="deleteProduct('${p.id}')" class="bg-slate-50 text-red-300 p-2 rounded-lg"><i class="fa-solid fa-trash-can text-xs"></i></button>
                     </div>
                 </div>`).join('');
             
-            // CUSTOMER STORE RENDER (Filters inactive items)
+            // Store Render with Filter
             const activeProducts = products.filter(p => p.is_active);
-            document.getElementById('store-grid').innerHTML = activeProducts.map(p => `
+            const filtered = currentFilter === 'All' ? activeProducts : activeProducts.filter(p => (p.category || 'Other') === currentFilter);
+
+            document.getElementById('store-grid').innerHTML = filtered.map(p => `
                 <div class="bg-white rounded-[2.5rem] border overflow-hidden shadow-sm animate-pop">
                     <img src="${p.image_url}" class="w-full h-40 object-cover">
                     <div class="p-4 text-center">
-                        <h3 class="font-black text-[9px] uppercase mb-1 truncate px-2">${p.name}</h3>
-                        <p class="moms-pink font-black text-xs mb-3">₹${p.price}</p>
+                        <h3 class="font-black text-[9px] uppercase mb-1 truncate px-2 text-slate-700">${p.name}</h3>
+                        <p class="moms-pink font-black text-xs mb-1">₹${p.price}</p>
+                        <p class="text-[8px] text-slate-400 uppercase font-bold mb-3">${p.sizes || 'Free Size'}</p>
                         <button class="w-full bg-slate-900 text-white py-2 rounded-2xl text-[8px] font-black uppercase">Add to bag</button>
                     </div>
                 </div>`).join('');
         }
 
-        // --- HELPERS ---
+        // Helpers
         function openEdit(id) {
             const p = products.find(i => i.id === id);
             document.getElementById('edit-id').value = p.id;
             document.getElementById('edit-name').value = p.name;
             document.getElementById('edit-price').value = p.price;
+            document.getElementById('edit-category').value = p.category || '';
+            document.getElementById('edit-sizes').value = p.sizes || '';
             document.getElementById('edit-img-prev').classList.add('hidden');
             selectedEditFile = null;
             document.getElementById('edit-modal').classList.remove('hidden');
             document.getElementById('edit-modal').classList.add('flex');
         }
         function closeEdit() { document.getElementById('edit-modal').classList.add('hidden'); }
-        async function deleteProduct(id) { if(confirm("Delete forever?")) { await supabaseClient.from('products').delete().eq('id', id); fetchProducts(); } }
         function previewEditFile(e) { selectedEditFile = e.target.files[0]; const reader = new FileReader(); reader.onload = (f) => { const prev = document.getElementById('edit-img-prev'); prev.src = f.target.result; prev.classList.remove('hidden'); }; reader.readAsDataURL(selectedEditFile); }
         async function uploadProduct() {
             const name = document.getElementById('p-name').value;
@@ -234,7 +251,7 @@
             const { error: uErr } = await supabaseClient.storage.from('product-images').upload(fName, selectedFile);
             if (uErr) { alert("Upload Failed!"); btn.disabled = false; return; }
             const { data: { publicUrl } } = supabaseClient.storage.from('product-images').getPublicUrl(fName);
-            await supabaseClient.from('products').insert([{ name, price: parseFloat(price), image_url: publicUrl, is_active: true }]);
+            await supabaseClient.from('products').insert([{ name, price: parseFloat(price), category: document.getElementById('p-category').value, sizes: document.getElementById('p-sizes').value, image_url: publicUrl, is_active: true }]);
             location.reload();
         }
         function handleFile(e) { selectedFile = e.target.files[0]; const r = new FileReader(); r.onload = (f) => { document.getElementById('img-prev').src = f.target.result; document.getElementById('preview-box').classList.remove('hidden'); }; r.readAsDataURL(selectedFile); }
