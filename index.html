@@ -21,8 +21,10 @@
     <header class="bg-white border-b sticky top-0 z-50 px-4 py-3 shadow-sm">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <div class="flex items-center gap-2">
-                <img src="https://i.ibb.co/v4m0fL7/moms-logo.png" alt="Moms World Logo" class="h-10 w-auto">
-                <span class="font-black text-lg tracking-tight uppercase hidden">Moms World</span>
+                <div class="h-10 w-10 bg-slate-100 rounded-full flex items-center justify-center overflow-hidden">
+                    <i class="fa-solid fa-heart moms-pink text-xl"></i>
+                </div>
+                <span class="font-black text-lg tracking-tight uppercase text-slate-900">Moms World</span>
             </div>
             <div id="status-badge" class="text-[10px] font-bold uppercase bg-pink-50 text-pink-600 px-3 py-1 rounded-full border border-pink-100">
                 <span class="inline-block w-2 h-2 bg-pink-500 rounded-full animate-pulse mr-1"></span> Live
@@ -33,7 +35,7 @@
     <main class="max-w-md mx-auto p-4 space-y-6">
         
         <div class="flex bg-slate-200 p-1 rounded-2xl">
-            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm transition-all">Inventory</button>
+            <button onclick="switchTab('admin')" id="tab-admin" class="flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm transition-all text-slate-900">Inventory</button>
             <button onclick="switchTab('store')" id="tab-store" class="flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500 transition-all">Customer Store</button>
         </div>
 
@@ -43,37 +45,260 @@
                     <i class="fa-solid fa-plus-circle moms-pink"></i> Create Product
                 </h2>
                 <div class="space-y-4">
-                    <input type="text" id="p-name" placeholder="Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                    <input type="text" id="p-name" placeholder="Product Name" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
                     <div class="flex gap-3">
                         <input type="number" id="p-price" placeholder="Price" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
                         <input type="text" id="p-category" placeholder="Category" class="w-1/2 p-4 bg-slate-50 border rounded-2xl outline-none">
                     </div>
                     <input type="text" id="p-sizes" placeholder="Sizes (e.g. S, M, L)" class="w-full p-4 bg-slate-50 border rounded-2xl outline-none">
                     
-                    <label class="relative flex flex-col items-center justify-center w-full h-40 border-2 border-dashed border-slate-300 rounded-3xl cursor-pointer bg-slate-50">
-                        <div id="upload-placeholder" class="text-center">
-                            <i class="fa-solid fa-camera text-3xl text-slate-300 mb-2"></i>
-                            <p class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tap to Snap Product Photo</p>
-                        </div>
-                        <img id="image-preview" src="" class="absolute inset-0 w-full h-full object-cover hidden">
-                        <input type="file" id="p-image" accept="image/*" capture="environment" class="hidden" onchange="previewFile(event)">
-                    </label>
-                    <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-widest">Create Product</button>
+                    <div class="grid grid-cols-2 gap-3">
+                        <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-camera text-xl text-slate-400 mb-1"></i>
+                            <span class="text-[9px] font-bold uppercase text-slate-500">Take Photo</span>
+                            <input type="file" accept="image/*" capture="environment" class="hidden" onchange="previewFile(event)">
+                        </label>
+                        <label class="flex flex-col items-center justify-center p-4 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer bg-slate-50 hover:bg-slate-100 transition">
+                            <i class="fa-solid fa-images text-xl text-slate-400 mb-1"></i>
+                            <span class="text-[9px] font-bold uppercase text-slate-500">From Gallery</span>
+                            <input type="file" accept="image/*" class="hidden" onchange="previewFile(event)">
+                        </label>
+                    </div>
+
+                    <div id="preview-container" class="hidden relative rounded-2xl overflow-hidden border">
+                        <img id="image-preview" src="" class="w-full h-48 object-cover">
+                        <button onclick="removePreview()" class="absolute top-2 right-2 bg-white/80 backdrop-blur p-2 rounded-full text-red-500 shadow-sm">
+                            <i class="fa-solid fa-trash-can"></i>
+                        </button>
+                    </div>
+
+                    <button onclick="saveProduct()" class="w-full bg-slate-900 text-white font-black py-4 rounded-2xl shadow-lg active:scale-95 transition-all uppercase tracking-widest">Publish Product</button>
                 </div>
             </section>
-            <h3 class="font-bold text-slate-400 text-xs uppercase px-2">Inventory Management</h3>
+            <h3 class="font-bold text-slate-400 text-[10px] uppercase px-2 tracking-widest">Active Inventory</h3>
             <div id="admin-inventory" class="space-y-3"></div>
         </div>
 
         <div id="view-store" class="hidden space-y-4 animate-pop">
             <div class="relative">
                 <i class="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
-                <input type="text" id="store-search" oninput="handleSearch()" placeholder="Search Moms World..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-pink-400">
+                <input type="text" id="store-search" oninput="handleSearch()" placeholder="Search Moms World..." class="w-full pl-12 pr-4 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-pink-400 shadow-sm">
             </div>
             <div class="flex gap-2 overflow-x-auto no-scrollbar py-1" id="filter-bar"></div>
-            <h2 class="text-lg font-black text-slate-800 px-1">Collections</h2>
             <div id="store-grid" class="grid grid-cols-2 gap-4"></div>
         </div>
     </main>
 
-    <div id="cart-drawer" class="fixed bottom-24 left-4 right-4 bg-slate-900 text-white p-5 rounded-
+    <div id="cart-drawer" class="fixed bottom-24 left-4 right-4 bg-slate-900 text-white p-5 rounded-[2.5rem] shadow-2xl hidden transform animate-pop z-50 border border-slate-700">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-black text-sm uppercase tracking-widest moms-pink italic">Moms World Cart</h3>
+            <button onclick="clearCart()" class="text-[10px] uppercase font-bold opacity-50">Clear</button>
+        </div>
+        <div id="cart-items" class="max-h-40 overflow-y-auto mb-4 space-y-3 text-sm no-scrollbar"></div>
+        <div class="border-t border-slate-700 pt-4 flex justify-between items-center">
+            <div>
+                <p class="text-[10px] opacity-50 uppercase font-bold">Total</p>
+                <p class="text-xl font-black" id="cart-total">$0.00</p>
+            </div>
+            <button onclick="checkoutWA()" class="bg-moms-pink text-white px-8 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest shadow-lg active:scale-95 transition-all">
+                Send to WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <nav class="fixed bottom-0 left-0 right-0 bg-white border-t p-4 z-50">
+        <div class="max-w-md mx-auto flex justify-around items-center">
+            <button onclick="switchTab('admin')" class="flex flex-col items-center gap-1 text-slate-900"><i class="fa-solid fa-box-open text-xl"></i><span class="text-[9px] font-bold">INVENTORY</span></button>
+            <button onclick="toggleQR()" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-qrcode text-xl"></i><span class="text-[9px] font-bold tracking-widest">QR CODE</span></button>
+            <button onclick="copyLink()" class="flex flex-col items-center gap-1 text-slate-400"><i class="fa-solid fa-share-nodes text-xl"></i><span class="text-[9px] font-bold">SHARE</span></button>
+        </div>
+    </nav>
+
+    <div id="qr-modal" class="fixed inset-0 bg-slate-900/90 backdrop-blur-md hidden items-center justify-center z-[60] p-6">
+        <div class="bg-white w-full max-w-xs rounded-[3rem] p-10 text-center shadow-2xl animate-pop">
+            <div id="qrcode" class="flex justify-center mb-8 p-3 bg-white border rounded-3xl"></div>
+            <button onclick="toggleQR()" class="w-full py-3 text-slate-400 font-bold mb-2">Dismiss</button>
+            <button onclick="window.print()" class="w-full bg-slate-900 text-white py-4 rounded-2xl font-black uppercase text-[10px] tracking-widest">Print Store QR</button>
+        </div>
+    </div>
+
+    <script>
+        const db = new Dexie("MomsWorldProDB");
+        db.version(1).stores({ products: "++id, name, price, category, image, sizes, isSoldOut" });
+
+        let cart = [];
+        let currentFilter = 'All';
+        let currentSearchQuery = '';
+
+        function previewFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = document.getElementById('image-preview');
+                img.src = e.target.result;
+                document.getElementById('preview-container').classList.remove('hidden');
+            }
+            reader.readAsDataURL(file);
+        }
+
+        function removePreview() {
+            document.getElementById('image-preview').src = "";
+            document.getElementById('preview-container').classList.add('hidden');
+        }
+
+        async function saveProduct() {
+            const name = document.getElementById('p-name').value;
+            const price = document.getElementById('p-price').value;
+            const category = document.getElementById('p-category').value || "New Arrival";
+            const sizes = document.getElementById('p-sizes').value;
+            const image = document.getElementById('image-preview').src;
+
+            if(!name || !price || !image) return alert("Please fill in all details and add a photo!");
+
+            await db.products.add({ name, price, category, sizes, image, isSoldOut: false });
+            
+            document.getElementById('p-name').value = '';
+            document.getElementById('p-price').value = '';
+            document.getElementById('p-category').value = '';
+            document.getElementById('p-sizes').value = '';
+            removePreview();
+            
+            refreshUI();
+            alert("Success! Product added to Moms World.");
+        }
+
+        async function deleteProduct(id) {
+            if(confirm("Permanently delete this product?")) { await db.products.delete(id); refreshUI(); }
+        }
+
+        async function toggleSoldOut(id, status) {
+            await db.products.update(id, { isSoldOut: !status }); refreshUI();
+        }
+
+        function addToCart(id, name, price) {
+            const sizeEl = document.getElementById(`size-${id}`);
+            const size = sizeEl ? sizeEl.value : null;
+            if(sizeEl && !size) return alert("Please select a size first!");
+
+            const existing = cart.find(i => i.id === id && i.size === size);
+            if(existing) existing.qty++;
+            else cart.push({ id, name, price, size, qty: 1 });
+            
+            updateCartUI();
+        }
+
+        function removeFromCart(i) { cart.splice(i, 1); updateCartUI(); }
+        function clearCart() { cart = []; updateCartUI(); }
+
+        function updateCartUI() {
+            const drawer = document.getElementById('cart-drawer');
+            const list = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            
+            if(cart.length === 0) { drawer.classList.add('hidden'); return; }
+            drawer.classList.remove('hidden');
+
+            let total = 0;
+            list.innerHTML = cart.map((item, i) => {
+                total += item.price * item.qty;
+                return `
+                    <div class="flex justify-between items-center bg-slate-800 p-3 rounded-2xl border border-slate-700">
+                        <div>
+                            <p class="font-bold text-xs uppercase tracking-tighter">${item.name} <span class="moms-pink">${item.size ? `(${item.size})` : ''}</span></p>
+                            <p class="text-[10px] opacity-50 font-black">${item.qty}x • $${(item.price * item.qty).toFixed(2)}</p>
+                        </div>
+                        <button onclick="removeFromCart(${i})" class="text-pink-500"><i class="fa-solid fa-circle-xmark"></i></button>
+                    </div>`;
+            }).join('');
+            totalEl.innerText = `$${total.toFixed(2)}`;
+        }
+
+        function checkoutWA() {
+            const phone = "1234567890"; // CHANGE THIS TO MOMS WORLD NUMBER
+            let total = 0;
+            let text = `🛍️ *MOMS WORLD ORDER*\n━━━━━━━━━━━━━━━\n`;
+            cart.forEach(item => {
+                total += item.price * item.qty;
+                text += `• ${item.qty}x ${item.name} ${item.size ? `[Size: ${item.size}]` : ''} - $${(item.price * item.qty).toFixed(2)}\n`;
+            });
+            text += `━━━━━━━━━━━━━━━\n💰 *Grand Total: $${total.toFixed(2)}*\n\nPlease confirm availability for delivery!`;
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(text)}`);
+        }
+
+        function handleSearch() {
+            currentSearchQuery = document.getElementById('store-search').value.toLowerCase();
+            refreshUI();
+        }
+
+        async function filterProducts(cat) { currentFilter = cat; refreshUI(); }
+
+        async function refreshUI() {
+            const all = await db.products.toArray();
+            const filtered = all.filter(p => (currentFilter === 'All' || p.category === currentFilter) && p.name.toLowerCase().includes(currentSearchQuery));
+            
+            renderAdmin(all);
+            renderStore(filtered);
+            renderFilters(all);
+        }
+
+        function renderAdmin(products) {
+            document.getElementById('admin-inventory').innerHTML = products.map(p => `
+                <div class="bg-white p-3 rounded-2xl flex items-center gap-4 border border-slate-100 shadow-sm animate-pop">
+                    <img src="${p.image}" class="w-14 h-14 rounded-xl object-cover border">
+                    <div class="flex-1 min-w-0"><h4 class="font-bold text-xs truncate uppercase tracking-tighter">${p.name}</h4><p class="text-[10px] moms-pink font-black">$${p.price}</p></div>
+                    <div class="flex gap-1">
+                        <button onclick="toggleSoldOut(${p.id}, ${p.isSoldOut})" class="p-2 rounded-lg ${p.isSoldOut ? 'bg-pink-100 text-pink-600' : 'bg-slate-50 text-slate-300'}"><i class="fa-solid fa-tag text-[10px]"></i></button>
+                        <button onclick="deleteProduct(${p.id})" class="p-2 bg-slate-50 text-slate-400 rounded-lg"><i class="fa-solid fa-trash-can text-[10px]"></i></button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function renderFilters(products) {
+            const cats = [...new Set(products.map(p => p.category))];
+            document.getElementById('filter-bar').innerHTML = `<button onclick="filterProducts('All')" class="px-6 py-2 rounded-full ${currentFilter === 'All' ? 'bg-slate-900 text-white shadow-md' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase tracking-widest transition-all">All</button>` + 
+                cats.map(cat => `<button onclick="filterProducts('${cat}')" class="px-6 py-2 rounded-full ${currentFilter === cat ? 'bg-slate-900 text-white shadow-md' : 'bg-white border text-slate-400'} text-[9px] font-black uppercase tracking-widest transition-all">${cat}</button>`).join('');
+        }
+
+        function renderStore(products) {
+            const grid = document.getElementById('store-grid');
+            if(products.length === 0) { grid.innerHTML = `<p class="col-span-2 text-center text-slate-300 py-20 text-[10px] uppercase font-black tracking-widest">Storefront Empty</p>`; return; }
+            grid.innerHTML = products.map(p => `
+                <div class="bg-white rounded-[2rem] border border-slate-100 overflow-hidden relative ${p.isSoldOut ? 'grayscale opacity-60' : ''} shadow-sm animate-pop">
+                    ${p.isSoldOut ? '<div class="absolute top-3 right-3 bg-pink-600 text-white text-[7px] font-black px-2 py-1 rounded-full z-10 uppercase">Sold Out</div>' : ''}
+                    <img src="${p.image}" class="w-full h-40 object-cover">
+                    <div class="p-4">
+                        <h3 class="font-black text-[10px] uppercase tracking-tighter mb-1 text-slate-700 truncate text-center">${p.name}</h3>
+                        <p class="moms-pink font-black text-xs mb-3 text-center">$${parseFloat(p.price).toFixed(2)}</p>
+                        ${p.sizes && !p.isSoldOut ? `<select id="size-${p.id}" class="w-full mb-3 p-2 text-[9px] border border-slate-100 rounded-xl bg-slate-50 outline-none text-center font-bold uppercase">${p.sizes.split(',').map(s => `<option value="${s.trim()}">${s.trim()}</option>`).join('')}</select>` : ''}
+                        <button onclick="${p.isSoldOut ? '' : `addToCart(${p.id}, '${p.name}', ${p.price})`}" 
+                            class="w-full ${p.isSoldOut ? 'bg-slate-200 text-slate-400' : 'bg-slate-900 text-white'} py-3 rounded-2xl text-[9px] font-black uppercase tracking-widest active:scale-95 transition-all shadow-md">
+                            ${p.isSoldOut ? 'Unavailable' : 'Add to Order'}
+                        </button>
+                    </div>
+                </div>`).join('');
+        }
+
+        function switchTab(tab) {
+            const admin = tab === 'admin';
+            document.getElementById('view-admin').classList.toggle('hidden', !admin);
+            document.getElementById('view-store').classList.toggle('hidden', admin);
+            document.getElementById('tab-admin').className = admin ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
+            document.getElementById('tab-store').className = !admin ? "flex-1 py-2.5 text-sm font-bold rounded-xl bg-white shadow-sm text-slate-900" : "flex-1 py-2.5 text-sm font-bold rounded-xl text-slate-500";
+            if(!admin) updateCartUI();
+            refreshUI();
+        }
+
+        let qrc = false;
+        function toggleQR() {
+            const modal = document.getElementById('qr-modal');
+            modal.classList.toggle('hidden'); modal.classList.toggle('flex');
+            if(!qrc) { new QRCode(document.getElementById("qrcode"), { text: window.location.href, width: 200, height: 200 }); qrc = true; }
+        }
+
+        function copyLink() { navigator.clipboard.writeText(window.location.href); alert("Moms World link copied!"); }
+
+        refreshUI();
+    </script>
+</body>
+</html>
